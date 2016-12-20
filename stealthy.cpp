@@ -10,8 +10,7 @@
 using namespace std;
 using namespace cv;
 
-int main()
-{
+int main() {
 
 	//setup filename--------------------------------------------------------------
 	int vidNum = 0; int picNum = 0;
