@@ -51,9 +51,9 @@ int main() {
 					    frameRate,Size(frame.cols,frame.rows));
 
 	//start the tweet thread and continue down the rest of the program
-	cout << "Creating thread" << endl;
+	cout << "[NOTICE] Creating thread" << endl;
 	thread tl(tweetThread);
-	cout << "Thread created" << endl;
+	cout << "[NOTICE] Thread created" << endl;
 
 
 	for(;;) {
