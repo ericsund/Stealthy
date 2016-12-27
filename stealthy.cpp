@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include <vector>
 #include <stdio.h>
 
@@ -10,6 +11,13 @@
 using namespace std;
 using namespace cv;
 
+void tweetThread() {
+	//start the Python script scan for, and tweet newly saved pictures
+	string tweetPicCommand = "python tweetPic.py";
+	system(tweetPicCommand.c_str());
+}
+
+
 int main() {
 
 	//setup filename--------------------------------------------------------------
@@ -20,6 +28,7 @@ int main() {
 
 	int frameRate = 15;
 	int changes = 0;  //number of red pixel occurrances
+	int tweetQueue = 0;  //number of photos needing to be tweet
 
 	VideoCapture capture;
 	bool update_bg_model = true;
@@ -41,7 +50,13 @@ int main() {
 							CV_FOURCC('j','p','e','g'),
 					    frameRate,Size(frame.cols,frame.rows));
 
-  for(;;) {
+	//start the tweet thread and continue down the rest of the program
+	cout << "Creating thread" << endl;
+	thread tl(tweetThread);
+	cout << "Thread created" << endl;
+
+
+	for(;;) {
   	capture >> frame;
 
 	  bg.operator()(frame, fgimg);
@@ -70,11 +85,12 @@ int main() {
 				if (frame.at<cv::Vec3b>(row, col) == Vec3b(0,0,255)) {
 					changes++;
 				}
-				else if (changes >= 400000) {
-					//take a picture of them!
+				else if (changes >= 400000) { //motion is detected w/ 400000 red pixels
+					//take a picture of them and save it
 					sprintf(filename,"Stealthy Photo%.4d.jpg",picNum++);
           imwrite(filename,frame);
-          cout << "Saved " << filename << endl;
+          cout << "[NOTICE] Saved " << filename << " to the filesystem!" << endl;
+
 					changes = 0;
 				}
 			}
@@ -82,6 +98,7 @@ int main() {
 
 		char c = (char)waitKey(5);
 		if(c == 27){
+			cout << "[NOTICE] Quitting Stealthy!" << endl;
 			break;
 		}
 	}
