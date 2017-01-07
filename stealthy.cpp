@@ -17,7 +17,6 @@ void tweetThread() {
 	system(tweetPicCommand.c_str());
 }
 
-
 int main() {
 
 	//setup filename--------------------------------------------------------------
