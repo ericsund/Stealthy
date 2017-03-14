@@ -1,7 +1,8 @@
 #include <iostream>
+#include <sstream>
+#include <stdio.h>
 #include <thread>
 #include <vector>
-#include <stdio.h>
 
 #include "opencv2/core/core.hpp"
 #include "opencv2/imgproc/imgproc.hpp"
@@ -17,7 +18,16 @@ void tweetThread() {
 	system(tweetPicCommand.c_str());
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+
+	//grab cam type---------------------------------------------------------------
+	istringstream ss(argv[1]);
+	int camType;
+	if (!(ss >> camType))
+	    cerr << "[NOTICE] It turns out " << argv[1] << " is invalid.  I wanted a "
+			"string!  Continuing with internal webcam...\n";
+
+	//---------------------------------------------------------------
 
 	//setup filename--------------------------------------------------------------
 	int vidNum = 0; int picNum = 0;
@@ -25,14 +35,14 @@ int main() {
 	sprintf(filename,"Stealthy Video%.2d.mov",vidNum++);
 	//----------------------------------------------------------------------------
 
-	int frameRate = 15;
+	int frameRate = 60;
 	int changes = 0;  //number of red pixel occurrances
 	int tweetQueue = 0;  //number of photos needing to be tweet
 
 	VideoCapture capture;
 	bool update_bg_model = true;
 
-	capture.open(0);
+	capture.open(camType);
 	cv::BackgroundSubtractorMOG2 bg;
 	bg.set ("nmixtures", 3);
 	std::vector < std::vector < cv::Point > >contours;
